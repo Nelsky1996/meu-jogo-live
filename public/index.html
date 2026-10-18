@@ -380,12 +380,21 @@
             }
 
             if (video) {
+                // DESBLOQUEIO DE ÁUDIO NO DISPARO
+                video.muted = false;
+                video.volume = 1.0;
                 video.currentTime = 0;
-                video.play().catch(e => console.warn('Reprodução automática:', e));
+                
+                video.play().catch(e => {
+                    console.warn('O navegador bloqueou o som por segurança. O vídeo continuará sem som.', e);
+                    video.muted = true;
+                    video.play();
+                });
 
                 video.onended = () => {
                     video.pause(); 
                     video.currentTime = 0.05;
+                    video.muted = true; // Volta a mutar para proteger o navegador
                     if (canvas) canvas.classList.remove(animClass); 
                     if (crib) crib.classList.remove('crib-active'); 
                 };
@@ -396,6 +405,7 @@
                         if (!video.paused) { 
                             video.pause(); 
                             video.currentTime = 0.05; 
+                            video.muted = true;
                         }
                         canvas.classList.remove(animClass); 
                         if (crib) crib.classList.remove('crib-active'); 
