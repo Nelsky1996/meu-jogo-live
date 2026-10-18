@@ -1,278 +1,248 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="pt-PT">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Live TikTok Game</title>
+    <title>Creche Interativa TikTok</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@900&display=swap" rel="stylesheet">
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            user-select: none;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            /* Fundo transparente para encaixar limpo no OBS / Live Studio */
-            background-color: rgba(0, 0, 0, 0);
-            color: #ffffff;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            /* Fundo totalmente transparente para mostrar a imagem que colocar no OBS por trás */
+            background-color: transparent;
+            font-family: 'Nunito', sans-serif;
             overflow: hidden;
-            width: 100vw;
             height: 100vh;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
             align-items: center;
-            padding: 30px 20px;
+            justify-content: space-evenly;
+            padding: 20px;
         }
 
-        /* Notificação superior de presentes */
-        #alert-box {
-            background: linear-gradient(135deg, #fe2c55, #ff0050);
-            color: #ffffff;
-            padding: 12px 30px;
-            border-radius: 50px;
-            font-size: 1.3rem;
-            font-weight: 800;
-            box-shadow: 0 8px 25px rgba(254, 44, 85, 0.6);
-            transform: translateY(-120px);
-            opacity: 0;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            border: 2px solid rgba(255, 255, 255, 0.4);
-            z-index: 100;
+        .test-panel {
+            position: absolute; top: 10px; left: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 10px; border-radius: 12px;
+            display: flex; flex-direction: column; gap: 5px; z-index: 9999;
+        }
+        .test-btn {
+            background: #ffffff; border: none; padding: 6px;
+            font-size: 11px; font-weight: 900; border-radius: 6px; cursor: pointer;
         }
 
-        #alert-box.show {
-            transform: translateY(0);
-            opacity: 1;
+        /* ================= BOLHAS DE LIKES ================= */
+        .ranking-title {
+            font-family: 'Fredoka One', cursive;
+            font-size: 32px; text-align: center; margin-bottom: 20px;
+            color: #00f2fe; text-transform: uppercase; letter-spacing: 2px;
+            text-shadow: 0 4px 8px rgba(0,0,0,0.8), 2px 2px 0px #000, -2px -2px 0px #000, 2px -2px 0px #000, -2px 2px 0px #000;
         }
-
-        /* Placar Top Likes */
-        #ranking-panel {
-            position: absolute;
-            top: 25px;
-            left: 25px;
-            background: rgba(18, 18, 24, 0.85);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 14px;
-            padding: 14px 18px;
-            width: 220px;
-            backdrop-filter: blur(8px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
-        }
-
-        #ranking-panel h3 {
-            font-size: 0.9rem;
-            color: #25f4ee;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            margin-bottom: 8px;
-        }
-
-        .ranking-row {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.85rem;
-            padding: 4px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .ranking-row:last-child {
-            border-bottom: none;
-        }
-
-        .ranking-user {
-            max-width: 130px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        .ranking-score {
-            color: #fe2c55;
-            font-weight: 700;
-        }
-
-        /* Área central dos vídeos */
-        #stage {
+        
+        .bubbles-container {
             display: flex;
             justify-content: center;
-            align-items: flex-end;
-            gap: 25px;
-            width: 100%;
-            max-width: 1100px;
-            margin-bottom: 30px;
-        }
-
-        .character-card {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            align-items: flex-end; 
+            gap: 20px;
+            min-height: 220px; 
             position: relative;
-        }
-
-        /* Moldura redonda para os vídeos */
-        .video-wrapper {
-            width: 200px;
-            height: 200px;
-            border-radius: 50%;
-            overflow: hidden;
-            border: 4px solid #3f4458;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
-            background: #111;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        .video-wrapper video {
             width: 100%;
-            height: 100%;
-            object-fit: cover;
         }
 
-        .character-tag {
-            margin-top: 12px;
-            background: rgba(20, 20, 28, 0.9);
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 700;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            text-align: center;
+        .bubble {
+            border-radius: 50%;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            color: white;
+            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.6), inset -8px -8px 20px rgba(0,0,0,0.4), inset 8px 8px 20px rgba(255,255,255,0.5);
+            text-align: center; overflow: hidden;
+            border: 3px solid rgba(255,255,255,0.8);
+            animation: floatBubble 3s ease-in-out infinite alternate;
         }
 
-        .character-tag span {
-            display: block;
-            font-size: 0.75rem;
-            color: #a1a1aa;
-            font-weight: 500;
+        @keyframes floatBubble {
+            0% { transform: translateY(0px); }
+            100% { transform: translateY(-20px); }
         }
 
-        /* Efeito de destaque no vídeo quando acionado */
-        .active-trigger {
-            transform: scale(1.18);
-            border-color: #25f4ee !important;
-            box-shadow: 0 0 30px rgba(37, 244, 238, 0.8);
+        /* ================= PALCO (AMBIENTE REAL) ================= */
+        .stage {
+            display: flex; 
+            justify-content: center; 
+            gap: 5px; /* Bebés bem próximos uns dos outros */
+            width: 100%; 
+            max-width: 950px;
+            margin-top: 30px;
         }
+
+        /* O '.crib' agora é apenas um espaço invisível, sem cartão branco */
+        .crib {
+            width: 280px; 
+            height: 420px;
+            background: transparent; /* Sem fundo */
+            border: none; /* Sem borda */
+            box-shadow: none; /* Sem sombra da caixa */
+            display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
+            padding: 10px; position: relative;
+            animation: gentleRock 4s ease-in-out infinite alternate;
+            z-index: 1; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        /* O SALTO PARA A FRENTE NO AMBIENTE */
+        .crib.crib-active {
+            z-index: 9999 !important;
+            transform: scale(1.35) translateY(-30px) !important;
+            animation: none !important; 
+            /* Um brilho forte por trás do bebé em vez de borda vermelha */
+            filter: drop-shadow(0 0 30px rgba(255, 0, 80, 0.8));
+        }
+
+        #crib-1 { animation-delay: 0s; }
+        #crib-2 { animation-delay: -1.5s; }
+        #crib-3 { animation-delay: -3s; }
+
+        @keyframes gentleRock {
+            0% { transform: rotate(-1.5deg) translateY(0); }
+            100% { transform: rotate(1.5deg) translateY(-5px); }
+        }
+
+        /* ÍCONES DOS PRESENTES (Ainda flutuam por cima) */
+        .gift-icon-display {
+            position: absolute;
+            top: -20px; 
+            font-size: 70px; 
+            filter: drop-shadow(0 15px 20px rgba(0,0,0,0.5));
+            z-index: 10;
+            animation: pulseGift 1.5s infinite alternate ease-in-out;
+        }
+        @keyframes pulseGift {
+            0% { transform: scale(1) rotate(-5deg); }
+            100% { transform: scale(1.15) rotate(5deg); }
+        }
+
+        /* SOMBRA NO CHÃO: Faz o bebé parecer estar pousado no ambiente */
+        .baby-container {
+            width: 100%; height: 280px;
+            display: flex; align-items: center; justify-content: center; position: relative;
+        }
+        .baby-canvas {
+            width: 100%; height: 100%; object-fit: contain;
+            /* Sombra projetada no chão imaginário */
+            filter: drop-shadow(0 25px 15px rgba(0,0,0,0.5));
+            transition: transform 0.2s ease;
+        }
+
+        video.source-video { display: none; }
+
+        /* TEXTOS FLUTUANTES COM CONTORNO GROSSO (Lê-se em qualquer fundo) */
+        .info-card {
+            text-align: center; width: 100%;
+            background: transparent; /* Sem fundo branco */
+            padding: 5px;
+            margin-top: 10px;
+        }
+        .baby-name { 
+            font-size: 28px; 
+            font-weight: 900; 
+            color: #ffffff; 
+            /* Contorno preto super forte */
+            text-shadow: 3px 3px 0 #000, -3px -3px 0 #000, 3px -3px 0 #000, -3px 3px 0 #000, 0 8px 15px rgba(0,0,0,0.6);
+            letter-spacing: 1px;
+        }
+        .gift-hint { 
+            font-size: 18px; 
+            font-weight: 900; 
+            color: #ffeb3b; 
+            background: rgba(0,0,0,0.6); 
+            border: 2px solid rgba(255,255,255,0.3); 
+            border-radius: 20px; 
+            padding: 4px 15px; 
+            display: inline-block; 
+            margin-top: 8px; 
+            box-shadow: 0 5px 10px rgba(0,0,0,0.5);
+        }
+
+        /* ANIMAÇÕES DAS AÇÕES */
+        .anim-eat { animation: turboEat 0.4s infinite alternate ease-in-out !important; }
+        @keyframes turboEat { 0% { transform: scale(1) translateY(0); } 100% { transform: scale(1.15) translateY(12px); } }
+
+        .anim-dance { animation: breakdance 0.4s infinite alternate ease-in-out !important; }
+        @keyframes breakdance { 0% { transform: translateY(0) rotate(-15deg) scale(1.1); } 100% { transform: translateY(-20px) rotate(15deg) scale(1.1); } }
+
+        .anim-scare { animation: suddenShock 0.8s cubic-bezier(.25,1.75,.35,.8) !important; }
+        @keyframes suddenShock { 0% { transform: scale(1); } 35% { transform: translateY(-40px) scale(1.2); } 100% { transform: scale(1); } }
     </style>
 </head>
 <body>
 
-    <div id="alert-box">🎁 Novo Presente!</div>
-
-    <div id="ranking-panel">
-        <h3>🏆 Top Likes</h3>
-        <div id="ranking-list">
-            <div class="ranking-row">
-                <span class="ranking-user">A aguardar...</span>
-                <span class="ranking-score">0</span>
+    <div>
+        <div class="ranking-title">🫧 ESTOURO DE LIKES 🫧</div>
+        <div class="bubbles-container" id="bubble-track">
+            <div style="color:white; font-size:24px; font-weight:900; align-self: center; text-shadow: 3px 3px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000;">
+                Dê dois toques na tela para encher a sua bolha!
             </div>
         </div>
     </div>
 
-    <div id="stage">
+    <div class="test-panel" id="debug-panel">
+        <button class="test-btn" onclick="triggerAction(1, 'eat')">🌹 Testar Rosa</button>
+        <button class="test-btn" onclick="triggerAction(2, 'dance')">🍦 Testar Sorvete</button>
+        <button class="test-btn" onclick="triggerAction(3, 'scare')">🫶 Testar Coração</button>
+        <button class="test-btn" onclick="testRanking()">🫧 Testar Bolhas</button>
+    </div>
+
+    <div class="stage">
         <!-- Bebé 1 -->
-        <div class="character-card" id="card-1">
-            <div class="video-wrapper" id="wrap-1">
-                <video id="video-1" src="/assets/bebe1.mp4" playsinline muted loop></video>
+        <div class="crib" id="crib-1">
+            <div class="gift-icon-display">🌹</div>
+            <div class="baby-container">
+                <video id="vid-1" class="source-video" src="/assets/bebe1.mp4" playsinline preload="auto" crossorigin="anonymous"></video>
+                <canvas id="canvas-1" class="baby-canvas"></canvas>
             </div>
-            <div class="character-tag">
-                Bebé 1
-                <span>Rosa = Comer</span>
+            <div class="info-card">
+                <div class="baby-name">Esfomeado</div>
+                <div class="gift-hint">Mande Rosa</div>
             </div>
         </div>
 
         <!-- Bebé 2 -->
-        <div class="character-card" id="card-2">
-            <div class="video-wrapper" id="wrap-2">
-                <video id="video-2" src="/assets/bebe2.mp4" playsinline muted loop></video>
+        <div class="crib" id="crib-2">
+            <div class="gift-icon-display">🍦</div>
+            <div class="baby-container">
+                <video id="vid-2" class="source-video" src="/assets/bebe2.mp4" playsinline preload="auto" crossorigin="anonymous"></video>
+                <canvas id="canvas-2" class="baby-canvas"></canvas>
             </div>
-            <div class="character-tag">
-                Bebé 2
-                <span>Sorvete = Dançar</span>
+            <div class="info-card">
+                <div class="baby-name">Dançarino</div>
+                <div class="gift-hint">Mande Sorvete</div>
             </div>
         </div>
 
         <!-- Bebé 3 -->
-        <div class="character-card" id="card-3">
-            <div class="video-wrapper" id="wrap-3">
-                <video id="video-3" src="/assets/bebe3.mp4" playsinline muted loop></video>
+        <div class="crib" id="crib-3">
+            <div class="gift-icon-display">🫶</div>
+            <div class="baby-container">
+                <video id="vid-3" class="source-video" src="/assets/bebe3.mp4" playsinline preload="auto" crossorigin="anonymous"></video>
+                <canvas id="canvas-3" class="baby-canvas"></canvas>
             </div>
-            <div class="character-tag">
-                Bebé 3
-                <span>Outros = Susto</span>
+            <div class="info-card">
+                <div class="baby-name">Dormindo</div>
+                <div class="gift-hint">Mande Coração</div>
             </div>
         </div>
     </div>
 
     <script>
-        const alertBox = document.getElementById('alert-box');
-        const rankingList = document.getElementById('ranking-list');
-
-        // Garante que os vídeos arrancam pausados no início
-        const videos = {
-            1: document.getElementById('video-1'),
-            2: document.getElementById('video-2'),
-            3: document.getElementById('video-3')
-        };
-
-        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-        let socket;
-
-        function connect() {
-            socket = new WebSocket(`${protocol}//${window.location.host}`);
-
-            socket.onmessage = (event) => {
-                const data = JSON.parse(event.data);
-
-                if (data.type === 'TRIGGER_BABY') {
-                    playBabyReaction(data.target, data.donor, data.giftName, data.repeatCount);
-                } else if (data.type === 'UPDATE_RANKING') {
-                    updateRanking(data.ranking);
-                }
-            };
-
-            socket.onclose = () => setTimeout(connect, 2000);
+        if (window.obsstudio) {
+            document.getElementById('debug-panel').style.display = 'none';
         }
 
-        function playBabyReaction(targetId, donor, gift, count) {
-            const vid = videos[targetId];
-            const wrap = document.getElementById(`wrap-${targetId}`);
-            if (!vid || !wrap) return;
+        const babyIds = [1, 2, 3];
+        const videoProcessors = [];
 
-            // Mostra o alerta superior
-            alertBox.innerHTML = `🎁 <strong>@${donor}</strong> enviou <strong>${gift} x${count}</strong>!`;
-            alertBox.classList.add('show');
-            clearTimeout(window.alertTimer);
-            window.alertTimer = setTimeout(() => alertBox.classList.remove('show'), 3500);
-
-            // Toca o vídeo correspondente e ativa a moldura iluminada
-            wrap.classList.add('active-trigger');
-            vid.currentTime = 0;
-            vid.play().catch(() => {});
-
-            clearTimeout(wrap.animTimer);
-            wrap.animTimer = setTimeout(() => {
-                wrap.classList.remove('active-trigger');
-                vid.pause();
-                vid.currentTime = 0;
-            }, 3500);
-        }
-
-        function updateRanking(ranking) {
-            if (!ranking || ranking.length === 0) return;
-            rankingList.innerHTML = ranking.map((item, index) => `
-                <div class="ranking-row">
-                    <span class="ranking-user">${index + 1}. @${item.user}</span>
-                    <span class="ranking-score">${item.count}</span>
-                </div>
-            `).join('');
-        }
-
-        connect();
-    </script>
-</body>
-</html>
+        function renderFrame(video, canvas, ctx) {
+            if (video.videoWidth === 0) return;
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            const frame = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            for (let i
