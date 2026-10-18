@@ -9,7 +9,7 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            /* Fundo totalmente transparente para mostrar a imagem que colocar no OBS por trás */
+            /* Fundo totalmente transparente para exibir o cenário do OBS */
             background-color: transparent;
             font-family: 'Nunito', sans-serif;
             overflow: hidden;
@@ -70,31 +70,28 @@
         .stage {
             display: flex; 
             justify-content: center; 
-            gap: 5px; /* Bebés bem próximos uns dos outros */
+            gap: 5px; 
             width: 100%; 
             max-width: 950px;
             margin-top: 30px;
         }
 
-        /* O '.crib' agora é apenas um espaço invisível, sem cartão branco */
         .crib {
             width: 280px; 
             height: 420px;
-            background: transparent; /* Sem fundo */
-            border: none; /* Sem borda */
-            box-shadow: none; /* Sem sombra da caixa */
+            background: transparent;
+            border: none;
+            box-shadow: none;
             display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
             padding: 10px; position: relative;
             animation: gentleRock 4s ease-in-out infinite alternate;
             z-index: 1; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        /* O SALTO PARA A FRENTE NO AMBIENTE */
         .crib.crib-active {
             z-index: 9999 !important;
             transform: scale(1.35) translateY(-30px) !important;
             animation: none !important; 
-            /* Um brilho forte por trás do bebé em vez de borda vermelha */
             filter: drop-shadow(0 0 30px rgba(255, 0, 80, 0.8));
         }
 
@@ -107,7 +104,6 @@
             100% { transform: rotate(1.5deg) translateY(-5px); }
         }
 
-        /* ÍCONES DOS PRESENTES (Ainda flutuam por cima) */
         .gift-icon-display {
             position: absolute;
             top: -20px; 
@@ -121,24 +117,21 @@
             100% { transform: scale(1.15) rotate(5deg); }
         }
 
-        /* SOMBRA NO CHÃO: Faz o bebé parecer estar pousado no ambiente */
         .baby-container {
             width: 100%; height: 280px;
             display: flex; align-items: center; justify-content: center; position: relative;
         }
         .baby-canvas {
             width: 100%; height: 100%; object-fit: contain;
-            /* Sombra projetada no chão imaginário */
             filter: drop-shadow(0 25px 15px rgba(0,0,0,0.5));
             transition: transform 0.2s ease;
         }
 
         video.source-video { display: none; }
 
-        /* TEXTOS FLUTUANTES COM CONTORNO GROSSO (Lê-se em qualquer fundo) */
         .info-card {
             text-align: center; width: 100%;
-            background: transparent; /* Sem fundo branco */
+            background: transparent;
             padding: 5px;
             margin-top: 10px;
         }
@@ -146,7 +139,6 @@
             font-size: 28px; 
             font-weight: 900; 
             color: #ffffff; 
-            /* Contorno preto super forte */
             text-shadow: 3px 3px 0 #000, -3px -3px 0 #000, 3px -3px 0 #000, -3px 3px 0 #000, 0 8px 15px rgba(0,0,0,0.6);
             letter-spacing: 1px;
         }
@@ -163,7 +155,6 @@
             box-shadow: 0 5px 10px rgba(0,0,0,0.5);
         }
 
-        /* ANIMAÇÕES DAS AÇÕES */
         .anim-eat { animation: turboEat 0.4s infinite alternate ease-in-out !important; }
         @keyframes turboEat { 0% { transform: scale(1) translateY(0); } 100% { transform: scale(1.15) translateY(12px); } }
 
@@ -197,7 +188,7 @@
         <div class="crib" id="crib-1">
             <div class="gift-icon-display">🌹</div>
             <div class="baby-container">
-                <video id="vid-1" class="source-video" src="/assets/bebe1.mp4" playsinline preload="auto" crossorigin="anonymous"></video>
+                <video id="vid-1" class="source-video" src="/assets/bebe1.mp4" playsinline preload="auto" muted></video>
                 <canvas id="canvas-1" class="baby-canvas"></canvas>
             </div>
             <div class="info-card">
@@ -210,7 +201,7 @@
         <div class="crib" id="crib-2">
             <div class="gift-icon-display">🍦</div>
             <div class="baby-container">
-                <video id="vid-2" class="source-video" src="/assets/bebe2.mp4" playsinline preload="auto" crossorigin="anonymous"></video>
+                <video id="vid-2" class="source-video" src="/assets/bebe2.mp4" playsinline preload="auto" muted></video>
                 <canvas id="canvas-2" class="baby-canvas"></canvas>
             </div>
             <div class="info-card">
@@ -223,7 +214,7 @@
         <div class="crib" id="crib-3">
             <div class="gift-icon-display">🫶</div>
             <div class="baby-container">
-                <video id="vid-3" class="source-video" src="/assets/bebe3.mp4" playsinline preload="auto" crossorigin="anonymous"></video>
+                <video id="vid-3" class="source-video" src="/assets/bebe3.mp4" playsinline preload="auto" muted></video>
                 <canvas id="canvas-3" class="baby-canvas"></canvas>
             </div>
             <div class="info-card">
@@ -242,7 +233,186 @@
         const videoProcessors = [];
 
         function renderFrame(video, canvas, ctx) {
-            if (video.videoWidth === 0) return;
+            if (!video || video.videoWidth === 0) return;
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-            const frame = ctx.getImageData(0, 0, canvas.width, canvas.height);
-            for (let i
+            try {
+                const frame = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                const len = frame.data.length / 4;
+                for (let i = 0; i < len; i++) {
+                    const r = frame.data[i * 4 + 0];
+                    const g = frame.data[i * 4 + 1];
+                    const b = frame.data[i * 4 + 2];
+                    // Remoção do fundo verde (Chroma key)
+                    if (g > 90 && g > r * 1.3 && g > b * 1.3) {
+                        frame.data[i * 4 + 3] = 0;
+                    }
+                }
+                ctx.putImageData(frame, 0, 0);
+            } catch (err) {
+                console.error("Erro no processamento do canvas:", err);
+            }
+        }
+
+        babyIds.forEach(id => {
+            const video = document.getElementById(`vid-${id}`);
+            const canvas = document.getElementById(`canvas-${id}`);
+            if (video && canvas) {
+                const ctx = canvas.getContext('2d', { willReadFrequently: true });
+                videoProcessors.push({ video, canvas, ctx });
+                
+                canvas.height = 400;
+                canvas.width = 280;
+
+                const setupInitialFrame = () => {
+                    if (video.videoWidth > 0 && video.videoHeight > 0) {
+                        const ratio = video.videoWidth / video.videoHeight;
+                        canvas.height = 400;
+                        canvas.width = Math.round(canvas.height * ratio);
+                    }
+                    renderFrame(video, canvas, ctx);
+                };
+
+                video.addEventListener('loadedmetadata', setupInitialFrame);
+                video.addEventListener('loadeddata', () => {
+                    video.currentTime = 0.05;
+                });
+                video.addEventListener('seeked', () => renderFrame(video, canvas, ctx));
+                video.addEventListener('canplay', () => {
+                    if (video.paused) renderFrame(video, canvas, ctx);
+                });
+
+                if (video.readyState >= 2) {
+                    setupInitialFrame();
+                }
+            }
+        });
+
+        function loop() {
+            videoProcessors.forEach(({ video, canvas, ctx }) => {
+                if (!video.paused && !video.ended) {
+                    renderFrame(video, canvas, ctx);
+                }
+            });
+            requestAnimationFrame(loop);
+        }
+        requestAnimationFrame(loop);
+
+        // Ligação WebSocket com deteção automática de WSS (HTTPS)
+        const wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+        let ws;
+
+        function connectWebSocket() {
+            ws = new WebSocket(`${wsProtocol}//${location.host}`);
+
+            ws.onopen = () => {
+                console.log('🟢 Conectado ao servidor!');
+            };
+
+            ws.onmessage = (event) => {
+                try {
+                    const data = JSON.parse(event.data);
+                    if (data.type === 'UPDATE_RANKING') return updateBubbleUI(data.ranking);
+                    if (data.type === 'TRIGGER_BABY') {
+                        if (data.target === 'all') {
+                            for (let i = 1; i <= 3; i++) triggerAction(i, 'dance');
+                        } else {
+                            triggerAction(data.target, data.action);
+                        }
+                    }
+                } catch(e) {
+                    console.error("Erro ao processar dados recebidos:", e);
+                }
+            };
+
+            ws.onclose = () => {
+                setTimeout(connectWebSocket, 2000);
+            };
+        }
+
+        connectWebSocket();
+
+        const classMap = { eat: 'anim-eat', dance: 'anim-dance', scare: 'anim-scare' };
+
+        function updateBubbleUI(rankingArray) {
+            const trackEl = document.getElementById('bubble-track');
+            if (!rankingArray || rankingArray.length === 0) return;
+            trackEl.innerHTML = ''; 
+
+            const maxScore = rankingArray[0].count || 1;
+
+            rankingArray.forEach((userObj, index) => {
+                const bubble = document.createElement('div');
+                bubble.className = 'bubble';
+                
+                const size = 80 + (userObj.count / maxScore) * 120;
+                bubble.style.width = size + 'px';
+                bubble.style.height = size + 'px';
+                bubble.style.animationDelay = (Math.random() * -2) + 's'; 
+                
+                if (index === 0) bubble.style.background = 'radial-gradient(circle at 30% 30%, #ff0050, #800020)';
+                else if (index === 1) bubble.style.background = 'radial-gradient(circle at 30% 30%, #00f2fe, #005080)';
+                else if (index === 2) bubble.style.background = 'radial-gradient(circle at 30% 30%, #fbbf24, #905000)';
+                else bubble.style.background = 'radial-gradient(circle at 30% 30%, #a855f7, #501080)';
+
+                const fontSizeScore = Math.max(18, size / 3.5);
+                const fontSizeName = Math.max(12, size / 7.5);
+
+                bubble.innerHTML = `
+                    <span style="font-weight:900; font-size:${fontSizeScore}px; color:#fbbf24; text-shadow:2px 2px 4px black; margin-bottom: -2px;">${userObj.count}</span>
+                    <span style="font-weight:900; font-size:${fontSizeName}px; max-width:85%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-shadow:2px 2px 4px black;">@${userObj.user}</span>
+                `;
+                
+                trackEl.appendChild(bubble);
+            });
+        }
+
+        function triggerAction(id, action) {
+            const canvas = document.getElementById(`canvas-${id}`);
+            const video = document.getElementById(`vid-${id}`);
+            const crib = document.getElementById(`crib-${id}`);
+            const animClass = classMap[action] || 'anim-eat';
+
+            if (crib) crib.classList.add('crib-active');
+            if (canvas) {
+                canvas.classList.remove('anim-eat', 'anim-dance', 'anim-scare');
+                void canvas.offsetWidth;
+                canvas.classList.add(animClass);
+            }
+
+            if (video) {
+                video.currentTime = 0;
+                video.play().catch(e => console.warn('Reprodução automática:', e));
+
+                video.onended = () => {
+                    video.pause(); 
+                    video.currentTime = 0.05;
+                    if (canvas) canvas.classList.remove(animClass); 
+                    if (crib) crib.classList.remove('crib-active'); 
+                };
+
+                clearTimeout(canvas?.timer);
+                if (canvas) {
+                    canvas.timer = setTimeout(() => {
+                        if (!video.paused) { 
+                            video.pause(); 
+                            video.currentTime = 0.05; 
+                        }
+                        canvas.classList.remove(animClass); 
+                        if (crib) crib.classList.remove('crib-active'); 
+                    }, 6000);
+                }
+            }
+        }
+
+        function testRanking() {
+            updateBubbleUI([ 
+                {user: "maria_tiktok", count: 2450}, 
+                {user: "joao_pedro", count: 1200}, 
+                {user: "carlos88", count: 850},
+                {user: "ana_clara", count: 420},
+                {user: "lucas", count: 110}
+            ]);
+        }
+    </script>
+</body>
+</html>
