@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TikTok LIVE Interactive Game</title>
+    <title>Live TikTok Game</title>
     <style>
         * {
             box-sizing: border-box;
@@ -13,9 +13,10 @@
         }
 
         body {
-            background-color: #0c0d14;
+            /* Fundo transparente para encaixar limpo no OBS / Live Studio */
+            background-color: rgba(0, 0, 0, 0);
             color: #ffffff;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             overflow: hidden;
             width: 100vw;
             height: 100vh;
@@ -23,35 +24,23 @@
             flex-direction: column;
             justify-content: space-between;
             align-items: center;
-            padding: 24px;
+            padding: 30px 20px;
         }
 
-        /* BANNER SUPERIOR DE PRESENTES */
-        #alert-container {
-            position: absolute;
-            top: 25px;
-            display: flex;
-            justify-content: center;
-            width: 100%;
-            pointer-events: none;
-            z-index: 1000;
-        }
-
+        /* Notificação superior de presentes */
         #alert-box {
             background: linear-gradient(135deg, #fe2c55, #ff0050);
             color: #ffffff;
-            padding: 14px 32px;
+            padding: 12px 30px;
             border-radius: 50px;
-            font-size: 1.4rem;
+            font-size: 1.3rem;
             font-weight: 800;
-            box-shadow: 0 8px 30px rgba(254, 44, 85, 0.6);
+            box-shadow: 0 8px 25px rgba(254, 44, 85, 0.6);
             transform: translateY(-120px);
             opacity: 0;
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            display: flex;
-            align-items: center;
-            gap: 12px;
             border: 2px solid rgba(255, 255, 255, 0.4);
+            z-index: 100;
         }
 
         #alert-box.show {
@@ -59,38 +48,33 @@
             opacity: 1;
         }
 
-        /* PLACAR TOP 5 LIKES */
+        /* Placar Top Likes */
         #ranking-panel {
             position: absolute;
-            top: 24px;
-            left: 24px;
-            background: rgba(18, 19, 26, 0.85);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px;
-            padding: 18px;
-            width: 250px;
-            backdrop-filter: blur(12px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-            z-index: 500;
+            top: 25px;
+            left: 25px;
+            background: rgba(18, 18, 24, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 14px;
+            padding: 14px 18px;
+            width: 220px;
+            backdrop-filter: blur(8px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
         }
 
-        #ranking-panel h2 {
-            font-size: 0.95rem;
+        #ranking-panel h3 {
+            font-size: 0.9rem;
             color: #25f4ee;
-            letter-spacing: 1.5px;
+            letter-spacing: 1px;
             text-transform: uppercase;
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            margin-bottom: 8px;
         }
 
         .ranking-row {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            padding: 6px 0;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
+            padding: 4px 0;
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         }
 
@@ -98,164 +82,127 @@
             border-bottom: none;
         }
 
-        .user-tag {
-            color: #e2e8f0;
-            max-width: 140px;
+        .ranking-user {
+            max-width: 130px;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
         }
 
-        .score-tag {
+        .ranking-score {
             color: #fe2c55;
             font-weight: 700;
         }
 
-        /* PALCO DOS BEBÉS */
+        /* Área central dos vídeos */
         #stage {
             display: flex;
-            justify-content: space-around;
+            justify-content: center;
             align-items: flex-end;
+            gap: 25px;
             width: 100%;
-            max-width: 1000px;
-            height: 65vh;
+            max-width: 1100px;
             margin-bottom: 30px;
         }
 
-        .baby-container {
+        .character-card {
             display: flex;
             flex-direction: column;
             align-items: center;
             position: relative;
         }
 
-        .baby-circle {
-            width: 170px;
-            height: 170px;
+        /* Moldura redonda para os vídeos */
+        .video-wrapper {
+            width: 200px;
+            height: 200px;
             border-radius: 50%;
-            background: radial-gradient(circle, #2d3142 0%, #1a1c26 100%);
+            overflow: hidden;
             border: 4px solid #3f4458;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
+            background: #111;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 5.5rem;
-            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.6);
-            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            position: relative;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        .baby-label {
-            margin-top: 18px;
-            background: #181924;
-            padding: 8px 18px;
-            border-radius: 30px;
-            font-size: 0.95rem;
+        .video-wrapper video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .character-tag {
+            margin-top: 12px;
+            background: rgba(20, 20, 28, 0.9);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
             font-weight: 700;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: #f8fafc;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.15);
             text-align: center;
         }
 
-        .baby-label span {
+        .character-tag span {
             display: block;
-            font-size: 0.8rem;
-            color: #94a3b8;
+            font-size: 0.75rem;
+            color: #a1a1aa;
             font-weight: 500;
-            margin-top: 2px;
         }
 
-        /* ANIMAÇÃO 1: COMER (PULSAR E MORDER) */
-        .anim-eat {
-            animation: eating 0.35s ease-in-out infinite alternate !important;
-            border-color: #22c55e !important;
-        }
-
-        @keyframes eating {
-            0% {
-                transform: scale(1) translateY(0);
-            }
-            100% {
-                transform: scale(1.25) translateY(-15px) rotate(-6deg);
-            }
-        }
-
-        /* ANIMAÇÃO 2: DANÇAR (SALTO E ROTAÇÃO) */
-        .anim-dance {
-            animation: dancing 0.3s ease-in-out infinite alternate !important;
-            border-color: #3b82f6 !important;
-        }
-
-        @keyframes dancing {
-            0% {
-                transform: translateY(0) rotate(-18deg) scale(1.05);
-            }
-            100% {
-                transform: translateY(-40px) rotate(18deg) scale(1.2);
-            }
-        }
-
-        /* ANIMAÇÃO 3: SUSTO (TREMOR E IMPACTO) */
-        .anim-scare {
-            animation: scaring 0.15s linear infinite alternate !important;
-            border-color: #ef4444 !important;
-        }
-
-        @keyframes scaring {
-            0% {
-                transform: scale(1.15) translate(-6px, 6px);
-                filter: hue-rotate(90deg) drop-shadow(0 0 15px #ef4444);
-            }
-            100% {
-                transform: scale(1.35) translate(6px, -6px);
-                filter: hue-rotate(270deg) drop-shadow(0 0 25px #dc2626);
-            }
+        /* Efeito de destaque no vídeo quando acionado */
+        .active-trigger {
+            transform: scale(1.18);
+            border-color: #25f4ee !important;
+            box-shadow: 0 0 30px rgba(37, 244, 238, 0.8);
         }
     </style>
 </head>
 <body>
 
-    <!-- Alerta Flutuante -->
-    <div id="alert-container">
-        <div id="alert-box">🎁 Novo Evento</div>
-    </div>
+    <div id="alert-box">🎁 Novo Presente!</div>
 
-    <!-- Placar Top 5 -->
     <div id="ranking-panel">
-        <h2>🏆 Top Curtidas</h2>
-        <div id="ranking-content">
+        <h3>🏆 Top Likes</h3>
+        <div id="ranking-list">
             <div class="ranking-row">
-                <span class="user-tag">A carregar...</span>
-                <span class="score-tag">0</span>
+                <span class="ranking-user">A aguardar...</span>
+                <span class="ranking-score">0</span>
             </div>
         </div>
     </div>
 
-    <!-- Três Bebés / Personagens -->
     <div id="stage">
         <!-- Bebé 1 -->
-        <div class="baby-container" id="baby-card-1">
-            <div class="baby-circle" id="baby-avatar-1">👶</div>
-            <div class="baby-label">
-                Bebé Comilão
+        <div class="character-card" id="card-1">
+            <div class="video-wrapper" id="wrap-1">
+                <video id="video-1" src="/assets/bebe1.mp4" playsinline muted loop></video>
+            </div>
+            <div class="character-tag">
+                Bebé 1
                 <span>Rosa = Comer</span>
             </div>
         </div>
 
         <!-- Bebé 2 -->
-        <div class="baby-container" id="baby-card-2">
-            <div class="baby-circle" id="baby-avatar-2">👶</div>
-            <div class="baby-label">
-                Bebé Dançarino
+        <div class="character-card" id="card-2">
+            <div class="video-wrapper" id="wrap-2">
+                <video id="video-2" src="/assets/bebe2.mp4" playsinline muted loop></video>
+            </div>
+            <div class="character-tag">
+                Bebé 2
                 <span>Sorvete = Dançar</span>
             </div>
         </div>
 
         <!-- Bebé 3 -->
-        <div class="baby-container" id="baby-card-3">
-            <div class="baby-circle" id="baby-avatar-3">👶</div>
-            <div class="baby-label">
-                Bebé Assustado
+        <div class="character-card" id="card-3">
+            <div class="video-wrapper" id="wrap-3">
+                <video id="video-3" src="/assets/bebe3.mp4" playsinline muted loop></video>
+            </div>
+            <div class="character-tag">
+                Bebé 3
                 <span>Outros = Susto</span>
             </div>
         </div>
@@ -263,95 +210,69 @@
 
     <script>
         const alertBox = document.getElementById('alert-box');
-        const rankingContent = document.getElementById('ranking-content');
+        const rankingList = document.getElementById('ranking-list');
+
+        // Garante que os vídeos arrancam pausados no início
+        const videos = {
+            1: document.getElementById('video-1'),
+            2: document.getElementById('video-2'),
+            3: document.getElementById('video-3')
+        };
+
+        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
         let socket;
 
-        // Estabelece ligação WebSocket segura (wss) na cloud ou insegura (ws) localmente
-        function connectWebSocket() {
-            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-            const socketUrl = `${protocol}//${window.location.host}`;
-
-            socket = new WebSocket(socketUrl);
-
-            socket.onopen = () => {
-                console.log('✅ Ligado ao WebSocket do servidor!');
-            };
+        function connect() {
+            socket = new WebSocket(`${protocol}//${window.location.host}`);
 
             socket.onmessage = (event) => {
-                try {
-                    const data = JSON.parse(event.data);
+                const data = JSON.parse(event.data);
 
-                    if (data.type === 'TRIGGER_BABY') {
-                        triggerBabyAnimation(data.target, data.action, data.donor, data.giftName, data.repeatCount);
-                    } else if (data.type === 'UPDATE_RANKING') {
-                        renderRanking(data.ranking);
-                    }
-                } catch (e) {
-                    console.error('Erro ao ler pacote:', e);
+                if (data.type === 'TRIGGER_BABY') {
+                    playBabyReaction(data.target, data.donor, data.giftName, data.repeatCount);
+                } else if (data.type === 'UPDATE_RANKING') {
+                    updateRanking(data.ranking);
                 }
             };
 
-            // Reconexão automática caso o servidor caia ou reinicie
-            socket.onclose = () => {
-                console.warn('⚠️ Ligação WebSocket fechada. Tentando reconectar em 2 segundos...');
-                setTimeout(connectWebSocket, 2000);
-            };
-
-            socket.onerror = (err) => {
-                console.error('Erro no WebSocket:', err);
-                socket.close();
-            };
+            socket.onclose = () => setTimeout(connect, 2000);
         }
 
-        // Desencadeia a animação no bebé e exibe o alerta
-        function triggerBabyAnimation(targetIndex, actionName, donor, giftName, count) {
-            const avatar = document.getElementById(`baby-avatar-${targetIndex}`);
-            if (!avatar) return;
+        function playBabyReaction(targetId, donor, gift, count) {
+            const vid = videos[targetId];
+            const wrap = document.getElementById(`wrap-${targetId}`);
+            if (!vid || !wrap) return;
 
-            // Mostra o toast superior com os dados reais
-            alertBox.innerHTML = `🎁 <strong>@${donor}</strong> enviou <strong>${giftName} x${count}</strong>!`;
+            // Mostra o alerta superior
+            alertBox.innerHTML = `🎁 <strong>@${donor}</strong> enviou <strong>${gift} x${count}</strong>!`;
             alertBox.classList.add('show');
+            clearTimeout(window.alertTimer);
+            window.alertTimer = setTimeout(() => alertBox.classList.remove('show'), 3500);
 
-            clearTimeout(window.alertTimeout);
-            window.alertTimeout = setTimeout(() => {
-                alertBox.classList.remove('show');
+            // Toca o vídeo correspondente e ativa a moldura iluminada
+            wrap.classList.add('active-trigger');
+            vid.currentTime = 0;
+            vid.play().catch(() => {});
+
+            clearTimeout(wrap.animTimer);
+            wrap.animTimer = setTimeout(() => {
+                wrap.classList.remove('active-trigger');
+                vid.pause();
+                vid.currentTime = 0;
             }, 3500);
-
-            // Reinicia classes para permitir novo disparo de animação
-            avatar.className = 'baby-circle';
-            void avatar.offsetWidth; // Força recálculo de estilo (reflow)
-
-            const animClass = `anim-${actionName}`;
-            avatar.classList.add(animClass);
-
-            clearTimeout(avatar.animTimeout);
-            avatar.animTimeout = setTimeout(() => {
-                avatar.classList.remove(animClass);
-            }, 3000);
         }
 
-        // Renderiza o Top 5 curtidas
-        function renderRanking(rankingList) {
-            if (!rankingList || rankingList.length === 0) {
-                rankingContent.innerHTML = `
-                    <div class="ranking-row">
-                        <span class="user-tag">Sem curtidas</span>
-                        <span class="score-tag">0</span>
-                    </div>
-                `;
-                return;
-            }
-
-            rankingContent.innerHTML = rankingList.map((item, index) => `
+        function updateRanking(ranking) {
+            if (!ranking || ranking.length === 0) return;
+            rankingList.innerHTML = ranking.map((item, index) => `
                 <div class="ranking-row">
-                    <span class="user-tag">${index + 1}. @${item.user}</span>
-                    <span class="score-tag">${item.count}</span>
+                    <span class="ranking-user">${index + 1}. @${item.user}</span>
+                    <span class="ranking-score">${item.count}</span>
                 </div>
             `).join('');
         }
 
-        // Inicia a escuta
-        connectWebSocket();
+        connect();
     </script>
 </body>
 </html>
