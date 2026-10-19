@@ -46,7 +46,7 @@
         /* ================= BOLHAS DE LIKES (MOVIMENTO CONTÍNUO) ================= */
         .ranking-title {
             font-family: 'Fredoka One', cursive;
-            font-size: 34px; text-align: center; margin-bottom: 5px;
+            font-size: 34px; text-align: center; margin-bottom: 10px;
             color: #00f2fe; text-transform: uppercase; letter-spacing: 2px;
             text-shadow: 0 4px 8px rgba(0,0,0,0.8), 2px 2px 0px #000, -2px -2px 0px #000, 2px -2px 0px #000, -2px 2px 0px #000;
             animation: pulseTitle 2.5s infinite ease-in-out;
@@ -61,14 +61,14 @@
         .bubbles-container {
             position: relative;
             width: 100%;
-            height: 200px;
+            height: 180px;
             overflow: hidden;
             z-index: 1;
         }
 
         .bubble {
             position: absolute;
-            bottom: -100px;
+            bottom: -150px;
             border-radius: 50%;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             color: white;
@@ -79,20 +79,9 @@
         }
 
         @keyframes floatUpBubble {
-            0% {
-                transform: translateY(0px) scale(0.8) rotate(0deg);
-                opacity: 0;
-            }
-            15% {
-                opacity: 1;
-            }
-            85% {
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(-280px) scale(1.05) rotate(5deg);
-                opacity: 0;
-            }
+            0% { transform: translateY(0px) scale(0.9); }
+            50% { transform: translateY(-100px) scale(1) rotate(3deg); }
+            100% { transform: translateY(-220px) scale(0.95) rotate(-3deg); }
         }
 
         /* ================= PALCO (BEBÊS MAIS PERTOS) ================= */
@@ -108,7 +97,7 @@
         }
 
         .crib {
-            width: 220px;
+            width: 220px; /* Reduzido para aproximar */
             height: 400px;
             background: transparent;
             border: none;
@@ -465,10 +454,11 @@
 
         function renderContinuousBubbles() {
             const trackEl = document.getElementById('bubble-track');
-            trackEl.innerHTML = ''; // Limpa as bolhas anteriores para evitar acumulação na tela
+            trackEl.innerHTML = ''; 
 
+            const maxScore = currentRanking[0]?.count || 1;
             const containerWidth = trackEl.clientWidth || window.innerWidth;
-            const bubbleCount = Math.max(6, currentRanking.length * 2);
+            const bubbleCount = Math.max(5, currentRanking.length * 2);
 
             for (let i = 0; i < bubbleCount; i++) {
                 const userObj = currentRanking[i % currentRanking.length];
@@ -490,8 +480,8 @@
                 else if (index === 2) bubble.style.background = 'radial-gradient(circle at 30% 30%, #fbbf24, #905000)';
                 else bubble.style.background = 'radial-gradient(circle at 30% 30%, #a855f7, #501080)';
 
-                // Velocidade de subida contínua variada (entre 3.5s e 6.5s) e loop infinito limpo
-                const duration = 3.5 + Math.random() * 3;
+                // Velocidade de subida contínua variada (entre 4s e 8s)
+                const duration = 4 + Math.random() * 4;
                 const delay = Math.random() * -duration;
                 bubble.style.animationDuration = duration + 's';
                 bubble.style.animationDelay = delay + 's';
