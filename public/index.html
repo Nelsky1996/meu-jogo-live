@@ -43,10 +43,10 @@
             font-size: 11px; font-weight: 900; border-radius: 6px; cursor: pointer;
         }
 
-        /* ================= BOLHAS DE LIKES ================= */
+        /* ================= BOLHAS DE LIKES (MOVIMENTO CONTÍNUO) ================= */
         .ranking-title {
             font-family: 'Fredoka One', cursive;
-            font-size: 34px; text-align: center; margin-bottom: 10px;
+            font-size: 34px; text-align: center; margin-bottom: 5px;
             color: #00f2fe; text-transform: uppercase; letter-spacing: 2px;
             text-shadow: 0 4px 8px rgba(0,0,0,0.8), 2px 2px 0px #000, -2px -2px 0px #000, 2px -2px 0px #000, -2px 2px 0px #000;
             animation: pulseTitle 2.5s infinite ease-in-out;
@@ -61,14 +61,14 @@
         .bubbles-container {
             position: relative;
             width: 100%;
-            height: 180px;
+            height: 200px;
             overflow: hidden;
             z-index: 1;
         }
 
         .bubble {
             position: absolute;
-            bottom: -150px;
+            bottom: -100px;
             border-radius: 50%;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             color: white;
@@ -79,17 +79,28 @@
         }
 
         @keyframes floatUpBubble {
-            0% { transform: translateY(0px) scale(0.9); }
-            50% { transform: translateY(-100px) scale(1) rotate(3deg); }
-            100% { transform: translateY(-220px) scale(0.95) rotate(-3deg); }
+            0% {
+                transform: translateY(0px) scale(0.8) rotate(0deg);
+                opacity: 0;
+            }
+            15% {
+                opacity: 1;
+            }
+            85% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-280px) scale(1.05) rotate(5deg);
+                opacity: 0;
+            }
         }
 
-        /* ================= PALCO (BEBÊS) ================= */
+        /* ================= PALCO (BEBÊS MAIS PERTOS) ================= */
         .stage {
             display: flex; 
             justify-content: center; 
             align-items: flex-end;
-            gap: 5px;
+            gap: 5px; /* Bem pertinhos um do outro */
             width: 100%; 
             max-width: 980px;
             margin-top: 10px;
@@ -216,7 +227,7 @@
         <button class="test-btn" onclick="triggerAction(1, 'eat')"> 🌹 Testar Rosa</button>
         <button class="test-btn" onclick="triggerAction(2, 'dance')">🍦 Testar Sorvete</button>
         <button class="test-btn" onclick="triggerAction(3, 'scare')"> ❤️ Testar Coração</button>
-        <button class="test-btn" onclick="testRanking()">🫧 Testar Bolhas (Temporário)</button>
+        <button class="test-btn" onclick="testRanking()">🫧 Testar Bolhas</button>
     </div>
 
     <div class="stage">
@@ -407,72 +418,6 @@
         }
         requestAnimationFrame(loop);
 
-        // ================= GESTÃO DE RANKING & BOLHAS =================
-        let realRanking = [];     // Guarda apenas os dados reais recebidos pelo WebSocket
-        let currentRanking = [];  // Guarda o que está a ser renderizado de momento
-        let testTimer = null;     // Temporizador para reset do modo de teste
-
-        function updateBubbleUI(rankingArray, isTest = false) {
-            if (!isTest) {
-                realRanking = rankingArray || [];
-                // Se um teste estiver ativo e chegar um evento real, cancela o temporizador de teste
-                if (testTimer) {
-                    clearTimeout(testTimer);
-                    testTimer = null;
-                }
-            }
-
-            currentRanking = rankingArray || [];
-            renderContinuousBubbles();
-        }
-
-        function renderContinuousBubbles() {
-            const trackEl = document.getElementById('bubble-track');
-            trackEl.innerHTML = ''; 
-
-            // Se não houver ninguém no ranking, mantém o contentor limpo
-            if (!currentRanking || currentRanking.length === 0) {
-                return;
-            }
-
-            const containerWidth = trackEl.clientWidth || window.innerWidth;
-            const bubbleCount = Math.max(currentRanking.length, 5);
-
-            for (let i = 0; i < bubbleCount; i++) {
-                const userObj = currentRanking[i % currentRanking.length];
-                const bubble = document.createElement('div');
-                bubble.className = 'bubble';
-                
-                const size = 65 + Math.random() * 50;
-                bubble.style.width = size + 'px';
-                bubble.style.height = size + 'px';
-                
-                const randomLeft = Math.random() * (containerWidth - size - 40) + 20;
-                bubble.style.left = randomLeft + 'px';
-
-                const index = i % currentRanking.length;
-                if (index === 0) bubble.style.background = 'radial-gradient(circle at 30% 30%, #ff0050, #800020)';
-                else if (index === 1) bubble.style.background = 'radial-gradient(circle at 30% 30%, #00f2fe, #005080)';
-                else if (index === 2) bubble.style.background = 'radial-gradient(circle at 30% 30%, #fbbf24, #905000)';
-                else bubble.style.background = 'radial-gradient(circle at 30% 30%, #a855f7, #501080)';
-
-                const duration = 4 + Math.random() * 4;
-                const delay = Math.random() * -duration;
-                bubble.style.animationDuration = duration + 's';
-                bubble.style.animationDelay = delay + 's';
-
-                const fontSizeScore = Math.max(16, size / 3.8);
-                const fontSizeName = Math.max(11, size / 8);
-
-                bubble.innerHTML = `
-                    <span style="font-weight:900; font-size:${fontSizeScore}px; color:#fbbf24; text-shadow:2px 2px 4px black; margin-bottom: -2px;">${userObj.count}</span>
-                    <span style="font-weight:900; font-size:${fontSizeName}px; max-width:85%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-shadow:2px 2px 4px black;">@${userObj.user}</span>
-                `;
-                
-                trackEl.appendChild(bubble);
-            }
-        }
-
         // ================= WEBSOCKET =================
         const wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
         let ws;
@@ -485,7 +430,7 @@
                     const data = JSON.parse(event.data);
                     if (data.type === 'UPDATE_RANKING') {
                         playPopSound();
-                        return updateBubbleUI(data.ranking, false);
+                        return updateBubbleUI(data.ranking);
                     }
                     if (data.type === 'TRIGGER_BABY') {
                         if (data.target === 'all') {
@@ -503,6 +448,70 @@
         connectWebSocket();
 
         const classMap = { eat: 'anim-eat', dance: 'anim-dance', scare: 'anim-scare' };
+
+        // ================= ATUALIZAÇÃO DAS BOLHAS FLUTUANTES CONTÍNUAS =================
+        let currentRanking = [
+            {user: "bem_vindo", count: 100},
+            {user: "tiktok_live", count: 50},
+            {user: "crianca", count: 25}
+        ];
+
+        function updateBubbleUI(rankingArray) {
+            if (rankingArray && rankingArray.length > 0) {
+                currentRanking = rankingArray;
+            }
+            renderContinuousBubbles();
+        }
+
+        function renderContinuousBubbles() {
+            const trackEl = document.getElementById('bubble-track');
+            trackEl.innerHTML = ''; // Limpa as bolhas anteriores para evitar acumulação na tela
+
+            const containerWidth = trackEl.clientWidth || window.innerWidth;
+            const bubbleCount = Math.max(6, currentRanking.length * 2);
+
+            for (let i = 0; i < bubbleCount; i++) {
+                const userObj = currentRanking[i % currentRanking.length];
+                const bubble = document.createElement('div');
+                bubble.className = 'bubble';
+                
+                const size = 65 + Math.random() * 55;
+                bubble.style.width = size + 'px';
+                bubble.style.height = size + 'px';
+                
+                // Distribuição horizontal espalhada
+                const randomLeft = Math.random() * (containerWidth - size - 40) + 20;
+                bubble.style.left = randomLeft + 'px';
+
+                // Cores baseadas no ranking
+                const index = i % currentRanking.length;
+                if (index === 0) bubble.style.background = 'radial-gradient(circle at 30% 30%, #ff0050, #800020)';
+                else if (index === 1) bubble.style.background = 'radial-gradient(circle at 30% 30%, #00f2fe, #005080)';
+                else if (index === 2) bubble.style.background = 'radial-gradient(circle at 30% 30%, #fbbf24, #905000)';
+                else bubble.style.background = 'radial-gradient(circle at 30% 30%, #a855f7, #501080)';
+
+                // Velocidade de subida contínua variada (entre 3.5s e 6.5s) e loop infinito limpo
+                const duration = 3.5 + Math.random() * 3;
+                const delay = Math.random() * -duration;
+                bubble.style.animationDuration = duration + 's';
+                bubble.style.animationDelay = delay + 's';
+
+                const fontSizeScore = Math.max(16, size / 3.8);
+                const fontSizeName = Math.max(11, size / 8);
+
+                bubble.innerHTML = `
+                    <span style="font-weight:900; font-size:${fontSizeScore}px; color:#fbbf24; text-shadow:2px 2px 4px black; margin-bottom: -2px;">${userObj.count + (i * 3)}</span>
+                    <span style="font-weight:900; font-size:${fontSizeName}px; max-width:85%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-shadow:2px 2px 4px black;">@${userObj.user}</span>
+                `;
+                
+                trackEl.appendChild(bubble);
+            }
+        }
+
+        // Inicializa as bolhas ao carregar
+        window.addEventListener('load', () => {
+            updateBubbleUI(currentRanking);
+        });
 
         function triggerAction(id, action) {
             const canvas = document.getElementById(`canvas-${id}`);
@@ -550,25 +559,15 @@
             }
         }
 
-        // ================= FUNÇÃO DE TESTE TEMPORÁRIO =================
         function testRanking() {
             playPopSound();
-            if (testTimer) clearTimeout(testTimer);
-
-            // Dispara utilizadores de teste
             updateBubbleUI([ 
                 {user: "maria_tiktok", count: 2450}, 
                 {user: "joao_pedro", count: 1200}, 
                 {user: "carlos88", count: 850},
                 {user: "ana_clara", count: 420},
                 {user: "lucas", count: 110}
-            ], true);
-
-            // Reseta após 7 segundos voltando para os dados reais (ou limpa a tela se não houver dados reais)
-            testTimer = setTimeout(() => {
-                updateBubbleUI(realRanking, false);
-                testTimer = null;
-            }, 7000);
+            ]);
         }
     </script>
 </body>
