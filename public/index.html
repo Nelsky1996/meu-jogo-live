@@ -21,7 +21,7 @@
             position: relative;
         }
 
-        /* Camada de partículas flutuantes de fundo */
+        /* Camada de partículas flutuantes */
         #ambient-particles {
             position: absolute;
             top: 0;
@@ -34,24 +34,22 @@
 
         .test-panel {
             position: absolute; top: 10px; left: 10px;
-            background: rgba(0, 0, 0, 0.85);
+            background: rgba(0, 0, 0, 0.8);
             padding: 10px; border-radius: 12px;
             display: flex; flex-direction: column; gap: 5px; z-index: 9999;
         }
         .test-btn {
             background: #ffffff; border: none; padding: 6px;
             font-size: 11px; font-weight: 900; border-radius: 6px; cursor: pointer;
-            transition: transform 0.1s;
         }
-        .test-btn:active { transform: scale(0.95); }
 
-        /* ================= ARENA DE BATALHA DE BOLHAS ================= */
+        /* ================= BOLHAS DE LIKES ================= */
         .ranking-title {
             font-family: 'Fredoka One', cursive;
-            font-size: 34px; text-align: center; margin-bottom: 5px;
+            font-size: 34px; text-align: center; margin-bottom: 10px;
             color: #00f2fe; text-transform: uppercase; letter-spacing: 2px;
             text-shadow: 0 4px 8px rgba(0,0,0,0.8), 2px 2px 0px #000, -2px -2px 0px #000, 2px -2px 0px #000, -2px 2px 0px #000;
-            animation: pulseTitle 2s infinite ease-in-out;
+            animation: pulseTitle 2.5s infinite ease-in-out;
             z-index: 1;
         }
 
@@ -63,3 +61,515 @@
         .bubbles-container {
             position: relative;
             width: 100%;
+            height: 180px;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .bubble {
+            position: absolute;
+            bottom: -150px;
+            border-radius: 50%;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            color: white;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.6), inset -8px -8px 20px rgba(0,0,0,0.4), inset 8px 8px 20px rgba(255,255,255,0.5);
+            text-align: center; overflow: hidden;
+            border: 3px solid rgba(255,255,255,0.8);
+            animation: floatUpBubble linear infinite;
+        }
+
+        @keyframes floatUpBubble {
+            0% { transform: translateY(0px) scale(0.9); }
+            50% { transform: translateY(-100px) scale(1) rotate(3deg); }
+            100% { transform: translateY(-220px) scale(0.95) rotate(-3deg); }
+        }
+
+        /* ================= PALCO (BEBÊS) ================= */
+        .stage {
+            display: flex; 
+            justify-content: center; 
+            align-items: flex-end;
+            gap: 5px;
+            width: 100%; 
+            max-width: 980px;
+            margin-top: 10px;
+            z-index: 1;
+        }
+
+        .crib {
+            width: 220px;
+            height: 400px;
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
+            padding: 5px; position: relative;
+            animation: gentleRock 3.5s ease-in-out infinite alternate;
+            z-index: 1; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .crib.crib-active {
+            z-index: 9999 !important;
+            transform: scale(1.35) translateY(-30px) !important;
+            animation: none !important; 
+            filter: drop-shadow(0 0 35px rgba(255, 0, 80, 0.9));
+        }
+
+        #crib-1 { animation-delay: 0s; }
+        #crib-2 { animation-delay: -1.2s; }
+        #crib-3 { animation-delay: -2.4s; }
+
+        @keyframes gentleRock {
+            0% { transform: rotate(-2deg) translateY(0); }
+            100% { transform: rotate(2deg) translateY(-8px); }
+        }
+
+        .gift-icon-display {
+            position: absolute;
+            top: -15px; 
+            font-size: 55px; 
+            filter: drop-shadow(0 15px 20px rgba(0,0,0,0.5));
+            z-index: 10;
+            animation: pulseGift 1.8s infinite alternate ease-in-out;
+        }
+        @keyframes pulseGift {
+            0% { transform: scale(1) rotate(-6deg); }
+            100% { transform: scale(1.18) rotate(6deg); }
+        }
+
+        .baby-container {
+            width: 100%; height: 260px;
+            display: flex; align-items: center; justify-content: center; position: relative;
+            animation: babyBreathing 2.8s ease-in-out infinite alternate;
+        }
+
+        #crib-1 .baby-container { animation-delay: 0s; }
+        #crib-2 .baby-container { animation-delay: -0.9s; }
+        #crib-3 .baby-container { animation-delay: -1.8s; }
+
+        @keyframes babyBreathing {
+            0% { transform: scale(1) translateY(0); }
+            100% { transform: scale(1.025) translateY(-4px); }
+        }
+
+        .baby-canvas {
+            width: 100%; height: 100%; object-fit: contain;
+            filter: drop-shadow(0 25px 15px rgba(0,0,0,0.5));
+            transition: transform 0.2s ease;
+        }
+
+        video.source-video { display: none; }
+
+        .info-card {
+            text-align: center; width: 100%;
+            background: transparent;
+            padding: 5px;
+            margin-top: 5px;
+        }
+        .baby-name { 
+            font-size: 24px; 
+            font-weight: 900; 
+            color: #ffffff; 
+            text-shadow: 3px 3px 0 #000, -3px -3px 0 #000, 3px -3px 0 #000, -3px 3px 0 #000, 0 8px 15px rgba(0,0,0,0.6);
+            letter-spacing: 1px;
+        }
+        .gift-hint { 
+            font-size: 15px; 
+            font-weight: 900; 
+            color: #ffeb3b; 
+            background: rgba(0,0,0,0.6); 
+            border: 2px solid rgba(255,255,255,0.3); 
+            border-radius: 20px; 
+            padding: 3px 12px; 
+            display: inline-block; 
+            margin-top: 5px; 
+            box-shadow: 0 5px 10px rgba(0,0,0,0.5);
+            animation: hintGlow 2s infinite alternate ease-in-out;
+        }
+
+        @keyframes hintGlow {
+            0% { box-shadow: 0 0 5px rgba(255, 235, 59, 0.3); }
+            100% { box-shadow: 0 0 15px rgba(255, 235, 59, 0.8); }
+        }
+
+        .anim-eat { animation: turboEat 0.4s infinite alternate ease-in-out !important; }
+        @keyframes turboEat { 0% { transform: scale(1) translateY(0); } 100% { transform: scale(1.15) translateY(12px); } }
+
+        .anim-dance { animation: breakdance 0.4s infinite alternate ease-in-out !important; }
+        @keyframes breakdance { 0% { transform: translateY(0) rotate(-15deg) scale(1.1); } 100% { transform: translateY(-20px) rotate(15deg) scale(1.1); } }
+
+        .anim-scare { animation: suddenShock 0.8s cubic-bezier(.25,1.75,.35,.8) !important; }
+        @keyframes suddenShock { 0% { transform: scale(1); } 35% { transform: translateY(-40px) scale(1.2); } 100% { transform: scale(1); } }
+    </style>
+</head>
+<body>
+
+    <!-- Canvas de partículas no fundo -->
+    <canvas id="ambient-particles"></canvas>
+
+    <div style="width: 100%;">
+        <div class="ranking-title">🫧 ESTOURO DE LIKES 🫧</div>
+        <div class="bubbles-container" id="bubble-track"></div>
+    </div>
+
+    <div class="test-panel" id="debug-panel">
+        <button class="test-btn" onclick="triggerAction(1, 'eat')"> 🌹 Testar Rosa</button>
+        <button class="test-btn" onclick="triggerAction(2, 'dance')">🍦 Testar Sorvete</button>
+        <button class="test-btn" onclick="triggerAction(3, 'scare')"> ❤️ Testar Coração</button>
+        <button class="test-btn" onclick="testRanking()">🫧 Testar Bolhas (Temporário)</button>
+    </div>
+
+    <div class="stage">
+        <!-- Bebé 1 -->
+        <div class="crib" id="crib-1">
+            <div class="gift-icon-display">🌹</div>
+            <div class="baby-container">
+                <video id="vid-1" class="source-video" src="/assets/bebe1.mp4" playsinline preload="auto" muted></video>
+                <canvas id="canvas-1" class="baby-canvas"></canvas>
+            </div>
+            <div class="info-card">
+                <div class="baby-name">Esfomeado</div>
+                <div class="gift-hint">Mande Rosa</div>
+            </div>
+        </div>
+
+        <!-- Bebé 2 -->
+        <div class="crib" id="crib-2">
+            <div class="gift-icon-display">🍦</div>
+            <div class="baby-container">
+                <video id="vid-2" class="source-video" src="/assets/bebe2.mp4" playsinline preload="auto" muted></video>
+                <canvas id="canvas-2" class="baby-canvas"></canvas>
+            </div>
+            <div class="info-card">
+                <div class="baby-name">Dançarino</div>
+                <div class="gift-hint">Mande Sorvete</div>
+            </div>
+        </div>
+
+        <!-- Bebé 3 -->
+        <div class="crib" id="crib-3">
+            <div class="gift-icon-display">❤️</div>
+            <div class="baby-container">
+                <video id="vid-3" class="source-video" src="/assets/bebe3.mp4" playsinline preload="auto" muted></video>
+                <canvas id="canvas-3" class="baby-canvas"></canvas>
+            </div>
+            <div class="info-card">
+                <div class="baby-name">Mulher Dança</div>
+                <div class="gift-hint">Mande Coração</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        if (window.obsstudio) {
+            document.getElementById('debug-panel').style.display = 'none';
+        }
+
+        // ================= SOM SINTETIZADO DE BOLHA (WEB AUDIO) =================
+        let audioCtx;
+        function playPopSound() {
+            try {
+                if (!audioCtx) {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(320, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(750, audioCtx.currentTime + 0.12);
+
+                gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.12);
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.13);
+            } catch (e) {}
+        }
+
+        // ================= GERADOR DE PARTÍCULAS NO FUNDO =================
+        const pCanvas = document.getElementById('ambient-particles');
+        const pCtx = pCanvas.getContext('2d');
+        let particles = [];
+
+        function resizeParticleCanvas() {
+            pCanvas.width = window.innerWidth;
+            pCanvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeParticleCanvas);
+        resizeParticleCanvas();
+
+        class Particle {
+            constructor() {
+                this.reset();
+            }
+            reset() {
+                this.x = Math.random() * pCanvas.width;
+                this.y = pCanvas.height + Math.random() * 50;
+                this.radius = Math.random() * 4 + 2;
+                this.speed = Math.random() * 1.2 + 0.6;
+                this.alpha = Math.random() * 0.4 + 0.2;
+                this.wobble = Math.random() * Math.PI * 2;
+            }
+            update() {
+                this.y -= this.speed;
+                this.wobble += 0.03;
+                this.x += Math.sin(this.wobble) * 0.6;
+                if (this.y < -20) this.reset();
+            }
+            draw() {
+                pCtx.beginPath();
+                pCtx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                pCtx.fillStyle = `rgba(0, 242, 254, ${this.alpha})`;
+                pCtx.fill();
+            }
+        }
+
+        for (let i = 0; i < 28; i++) {
+            const p = new Particle();
+            p.y = Math.random() * pCanvas.height;
+            particles.push(p);
+        }
+
+        function animateParticles() {
+            pCtx.clearRect(0, 0, pCanvas.width, pCanvas.height);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animateParticles);
+        }
+        animateParticles();
+
+        // ================= RENDERIZAÇÃO DOS BEBÉS =================
+        const babyIds = [1, 2, 3];
+        const videoProcessors = [];
+
+        function renderFrame(video, canvas, ctx) {
+            if (!video || video.videoWidth === 0) return;
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            try {
+                const frame = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                const len = frame.data.length / 4;
+                for (let i = 0; i < len; i++) {
+                    const r = frame.data[i * 4 + 0];
+                    const g = frame.data[i * 4 + 1];
+                    const b = frame.data[i * 4 + 2];
+                    if (g > 90 && g > r * 1.3 && g > b * 1.3) {
+                        frame.data[i * 4 + 3] = 0;
+                    }
+                }
+                ctx.putImageData(frame, 0, 0);
+            } catch (err) {}
+        }
+
+        babyIds.forEach(id => {
+            const video = document.getElementById(`vid-${id}`);
+            const canvas = document.getElementById(`canvas-${id}`);
+            if (video && canvas) {
+                const ctx = canvas.getContext('2d', { willReadFrequently: true });
+                videoProcessors.push({ video, canvas, ctx });
+                
+                canvas.height = 360;
+                canvas.width = 220;
+
+                const setupInitialFrame = () => {
+                    if (video.videoWidth > 0 && video.videoHeight > 0) {
+                        const ratio = video.videoWidth / video.videoHeight;
+                        canvas.height = 360;
+                        canvas.width = Math.round(canvas.height * ratio);
+                    }
+                    renderFrame(video, canvas, ctx);
+                };
+
+                video.addEventListener('loadedmetadata', setupInitialFrame);
+                video.addEventListener('loadeddata', () => { video.currentTime = 0.05; });
+                video.addEventListener('seeked', () => renderFrame(video, canvas, ctx));
+                video.addEventListener('canplay', () => { if (video.paused) renderFrame(video, canvas, ctx); });
+
+                if (video.readyState >= 2) setupInitialFrame();
+            }
+        });
+
+        function loop() {
+            videoProcessors.forEach(({ video, canvas, ctx }) => {
+                if (!video.paused && !video.ended) {
+                    renderFrame(video, canvas, ctx);
+                }
+            });
+            requestAnimationFrame(loop);
+        }
+        requestAnimationFrame(loop);
+
+        // ================= GESTÃO DE RANKING & BOLHAS =================
+        let realRanking = [];     // Guarda apenas os dados reais recebidos pelo WebSocket
+        let currentRanking = [];  // Guarda o que está a ser renderizado de momento
+        let testTimer = null;     // Temporizador para reset do modo de teste
+
+        function updateBubbleUI(rankingArray, isTest = false) {
+            if (!isTest) {
+                realRanking = rankingArray || [];
+                // Se um teste estiver ativo e chegar um evento real, cancela o temporizador de teste
+                if (testTimer) {
+                    clearTimeout(testTimer);
+                    testTimer = null;
+                }
+            }
+
+            currentRanking = rankingArray || [];
+            renderContinuousBubbles();
+        }
+
+        function renderContinuousBubbles() {
+            const trackEl = document.getElementById('bubble-track');
+            trackEl.innerHTML = ''; 
+
+            // Se não houver ninguém no ranking, mantém o contentor limpo
+            if (!currentRanking || currentRanking.length === 0) {
+                return;
+            }
+
+            const containerWidth = trackEl.clientWidth || window.innerWidth;
+            const bubbleCount = Math.max(currentRanking.length, 5);
+
+            for (let i = 0; i < bubbleCount; i++) {
+                const userObj = currentRanking[i % currentRanking.length];
+                const bubble = document.createElement('div');
+                bubble.className = 'bubble';
+                
+                const size = 65 + Math.random() * 50;
+                bubble.style.width = size + 'px';
+                bubble.style.height = size + 'px';
+                
+                const randomLeft = Math.random() * (containerWidth - size - 40) + 20;
+                bubble.style.left = randomLeft + 'px';
+
+                const index = i % currentRanking.length;
+                if (index === 0) bubble.style.background = 'radial-gradient(circle at 30% 30%, #ff0050, #800020)';
+                else if (index === 1) bubble.style.background = 'radial-gradient(circle at 30% 30%, #00f2fe, #005080)';
+                else if (index === 2) bubble.style.background = 'radial-gradient(circle at 30% 30%, #fbbf24, #905000)';
+                else bubble.style.background = 'radial-gradient(circle at 30% 30%, #a855f7, #501080)';
+
+                const duration = 4 + Math.random() * 4;
+                const delay = Math.random() * -duration;
+                bubble.style.animationDuration = duration + 's';
+                bubble.style.animationDelay = delay + 's';
+
+                const fontSizeScore = Math.max(16, size / 3.8);
+                const fontSizeName = Math.max(11, size / 8);
+
+                bubble.innerHTML = `
+                    <span style="font-weight:900; font-size:${fontSizeScore}px; color:#fbbf24; text-shadow:2px 2px 4px black; margin-bottom: -2px;">${userObj.count}</span>
+                    <span style="font-weight:900; font-size:${fontSizeName}px; max-width:85%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-shadow:2px 2px 4px black;">@${userObj.user}</span>
+                `;
+                
+                trackEl.appendChild(bubble);
+            }
+        }
+
+        // ================= WEBSOCKET =================
+        const wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+        let ws;
+
+        function connectWebSocket() {
+            ws = new WebSocket(`${wsProtocol}//${location.host}`);
+
+            ws.onmessage = (event) => {
+                try {
+                    const data = JSON.parse(event.data);
+                    if (data.type === 'UPDATE_RANKING') {
+                        playPopSound();
+                        return updateBubbleUI(data.ranking, false);
+                    }
+                    if (data.type === 'TRIGGER_BABY') {
+                        if (data.target === 'all') {
+                            for (let i = 1; i <= 3; i++) triggerAction(i, 'dance');
+                        } else {
+                            triggerAction(data.target, data.action);
+                        }
+                    }
+                } catch(e) {}
+            };
+
+            ws.onclose = () => setTimeout(connectWebSocket, 2000);
+        }
+
+        connectWebSocket();
+
+        const classMap = { eat: 'anim-eat', dance: 'anim-dance', scare: 'anim-scare' };
+
+        function triggerAction(id, action) {
+            const canvas = document.getElementById(`canvas-${id}`);
+            const video = document.getElementById(`vid-${id}`);
+            const crib = document.getElementById(`crib-${id}`);
+            const animClass = classMap[action] || 'anim-eat';
+
+            if (crib) crib.classList.add('crib-active');
+            if (canvas) {
+                canvas.classList.remove('anim-eat', 'anim-dance', 'anim-scare');
+                void canvas.offsetWidth;
+                canvas.classList.add(animClass);
+            }
+
+            if (video) {
+                video.muted = false;
+                video.volume = 1.0;
+                video.currentTime = 0;
+                
+                video.play().catch(() => {
+                    video.muted = true;
+                    video.play();
+                });
+
+                video.onended = () => {
+                    video.pause(); 
+                    video.currentTime = 0.05;
+                    video.muted = true;
+                    if (canvas) canvas.classList.remove(animClass); 
+                    if (crib) crib.classList.remove('crib-active'); 
+                };
+
+                clearTimeout(canvas?.timer);
+                if (canvas) {
+                    canvas.timer = setTimeout(() => {
+                        if (!video.paused) { 
+                            video.pause(); 
+                            video.currentTime = 0.05; 
+                            video.muted = true;
+                        }
+                        canvas.classList.remove(animClass); 
+                        if (crib) crib.classList.remove('crib-active'); 
+                    }, 6000);
+                }
+            }
+        }
+
+        // ================= FUNÇÃO DE TESTE TEMPORÁRIO =================
+        function testRanking() {
+            playPopSound();
+            if (testTimer) clearTimeout(testTimer);
+
+            // Dispara utilizadores de teste
+            updateBubbleUI([ 
+                {user: "maria_tiktok", count: 2450}, 
+                {user: "joao_pedro", count: 1200}, 
+                {user: "carlos88", count: 850},
+                {user: "ana_clara", count: 420},
+                {user: "lucas", count: 110}
+            ], true);
+
+            // Reseta após 7 segundos voltando para os dados reais (ou limpa a tela se não houver dados reais)
+            testTimer = setTimeout(() => {
+                updateBubbleUI(realRanking, false);
+                testTimer = null;
+            }, 7000);
+        }
+    </script>
+</body>
+</html>
